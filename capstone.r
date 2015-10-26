@@ -1,3 +1,4 @@
+rm(list=ls())
 library(MASS)
 library(gsl)
 
@@ -95,11 +96,11 @@ hybridScheme <- function(params){
        for(i in 1:floor(n*T)){
          Y1[i] <-0
          for (k in 1:min(i,kappa)){
-         Y1[i] = Y1[i] + W[-k,k+1]
+         Y1[i] = Y1[i] + W[i+1-k,k+1]
          }
        }
        Y <- Y1+Y2 ## The simulated series of main interst
-       v <- exp(eta*sqrt(2*alpha+1)*Y - eta*eta/2*sapply(seq(1:floor(n*T)),function(x){(x/n)^(2*alpha+1)}))
+       v <- xi*exp(eta*sqrt(2*alpha+1)*Y - eta*eta/2*sapply(seq(1:floor(n*T)),function(x){(x/n)^(2*alpha+1)}))
        #print(summary(v))
        #return(v[floor(n*T)])
        S <- S0 * exp(sum(v^0.5*Z) - 1/2*sum(v)/n)
@@ -114,13 +115,13 @@ hybridScheme <- function(params){
     return(MC)
 }
 
-#impvol <- function(k, st, T){
-#    payoff <- (st > exp(k)) * (st - exp(k))
-#    summary(payoff)
-#    return(BSImpliedVolCall(1, exp(k), T, 0, mean(payoff)))
-#}
+impvol <- function(k, st, T){
+    payoff <- (st > exp(k)) * (st - exp(k))
+    print(summary(payoff))
+    return(BSImpliedVolCall(1, exp(k), T, 0, mean(payoff)))
+}
 params <- list(S0=1, xi=0.235^2, eta=1.9, alpha=-0.43, rho=-0.9)
-finalPrices <- hybridScheme(params)(100, 100, 1, 1)
+finalPrices <- hybridScheme(params)(10000, 100, 1, 1)
 summary(finalPrices)
 
 vol <- function(k){sapply(k, function(x){impvol(x, finalPrices, 1)})}
