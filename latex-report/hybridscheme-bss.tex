@@ -1,0 +1,241 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{latexsym} 
+\usepackage{graphicx}
+\usepackage{bm}  
+\usepackage{overpic} 
+\usepackage[normalem]{ulem}
+  
+\usepackage{exscale}
+\usepackage{amsfonts}
+\usepackage[usenames,dvipsnames]{color} % load color package
+
+\textwidth=6.0in \textheight=8.8in \hoffset=-0.2in
+\voffset=-0.85in
+\parskip=6pt
+\baselineskip=9pt
+\topmargin 0.8in
+ 
+\def\black#1{\textcolor{black}{#1}}
+\def\blue#1{\textcolor{blue}{#1}}
+\def\red#1{\textcolor{red}{#1}}
+\def\green#1{\textcolor{green}{#1}}
+\def\yellow#1{\textcolor{yellow}{#1}}
+\def\orange{\textcolor{BurntOrange}}
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{remark}{Remark}[section]
+\newtheorem{example}{Example}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{cor}{Corollary}[section]
+\newtheorem{corollary}{Corollary}[section]
+
+\numberwithin{equation}{section}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\sigl}{\sigma_L}
+\newcommand{\BS}{\rm BS}
+\newcommand{\p}{\partial}
+\newcommand{\var}{{\rm var}}
+\newcommand{\cov}{{\rm cov}}
+\newcommand{\beaa}{\begin{eqnarray*}}
+\newcommand{\eeaa}{\end{eqnarray*}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+
+
+\def\cC{\mathcal C}
+\def\cD{\mathcal D}
+\def\cS{\mathcal S}
+\def\cH{\mathcal H}
+\def\cI{\mathcal I}
+\def\cJ{\mathcal J}
+\def\cL{\mathcal L}
+\def\cV{\mathcal V}
+\def\cR{\mathcal R}
+\def\bR{\mathbb R}
+\def\cX{\mathcal X}
+\def\cF{\mathcal F}
+\def\bP{\mathbb P}
+\def\bE{\mathbb E}
+\def\bN{\mathbb N}
+\def\bT{\mathbb T}
+\def\bC{\mathbb C}
+\def\var{\text{var\,}}
+\def\eps{\varepsilon}
+
+\newcommand{\mt}{\mathbf{t}}
+\newcommand{\mS}{\mathbf{S}}
+\newcommand{\tC}{\widetilde{C}}
+\newcommand{\hC}{\widehat{C}}
+\newcommand{\tH}{\widetilde{H}}
+\renewcommand{\O}{\mathcal{O}}
+\newcommand{\dt}{\Delta t}
+\newcommand{\tr}{{\rm tr}}
+
+\providecommand{\keywords}[1]{\textbf{Keywords:} #1}
+
+\begin{document}
+
+
+
+\title{\bf Implementation with sensitivity analysis on Hybrid scheme for Brownian semistationary processes}
+
+\author{
+	Weiyi Chen\footnote{Department of Mathematics, Baruch College, CUNY. {\tt  weiyi.chen@baruchmail.cuny.edu}}{\setcounter{footnote}{1}},
+    Rongxin Yu\footnote{Department of Mathematics, Baruch College, CUNY. {\tt  rongxin.yu@baruchmail.cuny.edu}}{\setcounter{footnote}{2}}, 
+    Wenbo Zhang\footnote{Department of Mathematics, Baruch College, CUNY. {\tt wenbo.zhang@baruchmail.cuny.edu}{\setcounter{footnote}{3}}}
+}
+
+%\date{This version: December 25, 2011}
+
+
+\maketitle\thispagestyle{empty}
+ 
+%%***************************************************************************
+%%
+%%  Document begins here
+%%
+%%***************************************************************************
+
+
+
+\begin{abstract}
+	In this report, we implement the hybrid scheme for Brownian semistationary processes \cite{bennedsen2015hybrid} (2015), which is an approximation of the process via discretizing the stochastic integral representation of the process in the time domain, and it is a combination of Wiener integrals of the power function and a Riemann sum. We exemplify the use of the hybrid scheme by two numerical experiments, where we replicate the study of Monte Carlo option pricing in the rough Bergomi model of Bayer et al. \cite{bayer2015pricing}, and analyze stability and sensitivity of parameters of hybrid scheme on price, respectively.
+\end{abstract}
+
+\keywords{Stochastic simulation; discretization; Brownian semistationary process; stochastic volatility; regular variation; estimation; option pricing; rough volatility; volatility smile.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+%  Section: Introduction
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+
+	\subsection{Brownian semistationary processes}
+
+		A $\mathcal{BSS}$ process $X$ is defined via the integral representation
+		\begin{equation}
+        	X(t) = \int_{-\infty}^{t} g(t-s)\sigma(s)dW(s)
+        \end{equation}
+        where $W$ is a two-sided Brownian motion providing the fundamental noise innovations, the amplitude of which is modulated by a stochastic volatility (intermittency) process $\sigma$ that may depend on $W$. This driving noise is then convolved with a deterministic kernel function $g$ that specifies the dependence structure of $X$.
+        
+        In the applications mentioned above, the case where X is not a semimartingale is particularly
+relevant. This situation arises when the kernel function $g$ behaves like a power-law near zero; more
+specifically, when for some $\alpha \in (-\frac{1}{2}, \frac{1}{2})$ and $\alpha \neq 0$,
+		\begin{equation}
+        	g(x) \propto x^\alpha \text{ for small } x>0
+        \end{equation}
+
+    \subsection{Hybrid scheme}
+    
+    	In Bennedsen et al.'s paper \cite{bennedsen2015hybrid}, we study a new discretization scheme for $\mathcal{BSS}$ processes based on approximating the kernel function $g$ in the time domain. The starting point is the Riemann-sum discretization of (1.1). The Riemann-sum scheme builds on an approximation of $g$ using step functions, which has the pitfall of failing to capture appropriately the steepness of $g$ near zero. In particular, this becomes a serious defect under (1.2) when $\alpha \in (-\frac{1}{2}, 0)$. 
+    
+    	In hybrid scheme, the problem is mitigated by approximating $g$ using an appropriate power function near zero and a step function elsewhere. The resulting discretization scheme can be realized as a linear combination of Wiener integrals with respect to the driving Brownian motion $W$ and a Riemann sum.
+    
+    \subsection{Implementation}
+    
+    	To replicate the hybrid scheme implementation recipe from Bennedsen et al.'s paper \cite{bennedsen2015hybrid}, we perform the numerical experiment of Monte Carlo option pricing in the rough Bergomi stochastic volatility model of Bayer et al. \cite{bayer2015pricing}, in R programming language. We use the hybrid scheme to simulate the volatility process in this model and we verify the resulting implied volatility smiles are indistinguishable from those simulated using a method that involves exact simulation of the volatility process. After verification we optimize the codes via vectorizing and utilize multiprocessing technique to accelerate Monte Carlo methods in Python.
+    
+    \subsection{Sensitivity analysis}
+    
+    	After replication, we perform further numerical experiment of sensitivity analysis on option pricing in the rough Bergomi stochastic volatility model of Bayer et al. \cite{bayer2015pricing}. Parameter values used in the rBergomi model include $S_0, \epsilon, \eta, \alpha, \rho$ listed on Bennedsen et al.'s paper \cite{bennedsen2015hybrid}. Parameter values used in Hybrid Scheme include number of periods $n$, the period index to separate the approximate power function near zero and the step function $\kappa$, and the time period unit $T$. And there are other parameter values coming from Monte Carlo method. We keep track of the option price by changing one of the parameter while keep other constant, to figure out the sensitivity of each parameter on option price.
+    
+    \subsection{Report Organization}
+    
+    	The rest of this report is organized as follows. In Section 2 we recall the implementation of Hybrid Scheme for $\mathcal{BSS}$ process and introduce our initial assumptions for parameters, including the extension of the scheme to a class of truncated BSS processes, then proceed to option pricing under rough volatility. Section 3 briefly discusses the code structure with results, and presents the numerical experiments mentioned above. Section 4 contains discussing on computational complexity and implementation improvements from both theory perspective, i.e. vectorization programming, and technique perspective, i.e. multiprocessing. Finally, Section 5 presents the sensitivities of the experiment results.
+
+\section{Implementation}
+
+	Simulating the $\mathcal{BSS}$ process $X$ on the equidistant grid $ \{0, \frac{1}{n}, \frac{2}{n}, \dots, \frac{\lfloor nT \rfloor}{n} \} $ for some $T>0$ using the hybrid scheme entails generating
+
+  	\begin{equation}
+  		X_n(\frac{i}{n}), i = 0, 1, \dots, \lfloor nT \rfloor.
+  	\end{equation}
+
+\subsection{}
+
+
+\section{Numerical experiment and result}
+
+\section{Complexity improvements}
+
+\section{Sensitivities analysis}
+
+% \begin{figure}[htb!]
+% \begin{center}
+% \includegraphics{SVIarb}
+% \caption{This is a graph of something}
+% \label{fig:someGraph}
+% \end{center}
+% \end{figure}
+
+\section{Conclusion}
+
+
+%\appendix
+
+
+
+
+
+\section*{Acknowledgments}
+
+We are very grateful to Jim Gatheral's guide.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+%  Bibliography
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{thebibliography}{}
+
+\bibitem{barndorff2007ambit}
+{Barndorff-Nielsen, Ole E} and {Schmiegel, J{\"u}rgen}
+{Ambit processes; with applications to turbulence and tumour growth}
+{\it Springer} (2007)
+
+\bibitem{barndorff2009brownian}
+{Barndorff-Nielsen, Ole E} and {Schmiegel, J{\"u}rgen}
+{Advanced financial modelling}
+{Radon Ser. Comput. Appl. Math} (2009)
+
+\bibitem{bayer2015pricing}
+{Bayer, Christian}, {Friz, Peter K} and {Gatheral, Jim}
+{Available at SSRN}
+{2015}
+
+\bibitem{bennedsen2015hybrid} 
+{Bennedsen, Mikkel}, {Lunde, Asger} and {Pakkanen, Mikko S}
+{Hybrid scheme for Brownian semistationary processes},
+{\it arXiv preprint arXiv:1507.03004} (2015)
+
+\bibitem{jimbook} { Gatheral, J.},
+{The Volatility Surface: A Practitioner's Guide},
+{Wiley Finance} (2006).
+
+\bibitem{ghlow}
+{ Gatheral, J.}, { Hsu, E.P.}, { Laurence, P.}, { Ouyang, C.}, and { Wang, T.-H.},
+{Asymptotics of implied volatility in local volatility models},
+{\it Mathematical Finance} (2011) forthcoming.
+
+\end{thebibliography}
+
+\end{document}
+
+
