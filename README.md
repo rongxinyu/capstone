@@ -2,10 +2,6 @@
 Baruch MFE Capstone project
 
 ## Running Guide for Mac System
-Make sure your system meets these requirements:
-    - Operating system: MacOS 10.7 or over (it has been tested successfully on these)
-    - RAM: 2GB.
-    - Disk space: 2GB
 
 ### Step 1: Install Command Line Tools
     - Open terminal, type “xcode-select --install” in terminal (without quotes)
