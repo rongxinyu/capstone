@@ -2,8 +2,8 @@ rm(list=ls())
 library(MASS)
 library(gsl)
 
-convolve <- function(x, y){
-    return(cumsum(x * rev(y)))
+Myconvolve <- function(x, y, length){
+    return(sum(x[1:length] * rev(y[1:length])))
 }
 
 bstar <- function(k, alpha){
@@ -91,7 +91,7 @@ hybridScheme <- function(params){
        
        Gamma <- sapply(seq(1:floor(n*T)), function(x){(bstar(x, alpha)/n)^alpha}) 
        Gamma[1:kappa] <- 0
-       Y2 <- convolve(Gamma, W[,1])
+       Y2 <- sapply(seq(1,floor(n*T)), function(x){convolve(Gamma, W[,1], x))
        Y1 <- rep(0, floor(n*T))
        for(i in 1:floor(n*T)){
          Y1[i] <-0
