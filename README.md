@@ -9,16 +9,16 @@ Baruch MFE Capstone project
   
 ### Step 2: Install Homebrew
 
-```
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.bash_profile
-```
+  ```
+  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.bash_profile
+  ```
 
     Open an new terminal tab with Cmd+T (you should also close the old one), then run the following command to make sure everything works:
 
-    ```
-    brew doctor
-    ```
+  ```
+  brew doctor
+  ```
 
 ### Step 3: Install Homebrew Cask and Tap
 
