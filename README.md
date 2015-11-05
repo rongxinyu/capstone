@@ -4,8 +4,8 @@ Baruch MFE Capstone project
 ## Running Guide for Mac System
 
 ### Step 1: Install Command Line Tools
-    - Open terminal, type “xcode-select --install” in terminal (without quotes)
-    - A pop-up windows will appear asking you about install tools, choose install tools, wait install to finish
+- Open terminal, type “xcode-select --install” in terminal (without quotes)
+- A pop-up windows will appear asking you about install tools, choose install tools, wait install to finish
   
 ### Step 2: Install Homebrew
 Run the following commands to install homebrew.
