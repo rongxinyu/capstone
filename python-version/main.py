@@ -58,9 +58,13 @@ def impvol(k, st, T):
 def main():
     params = (1., 0.235**2, 1.9, -.43, -0.)
     finalPrices = hybridScheme(params)(100, 100, 1, 1.)
+    pyplot.hist(finalPrices, 50, normed=1, histtype='bar', rwidth=.8)
+
     strikes = array(range(-100,100)) / 100.
     vols = array([impvol(k, finalPrices, 1,) for k in strikes])
     pyplot.plot(strikes, vols)
+    
+    pyplot.show()
 
 if __name__ == '__main__':
     main()
