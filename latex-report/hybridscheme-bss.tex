@@ -118,7 +118,7 @@
 \title{\bf Implementation with sensitivity analysis on Hybrid scheme for Brownian semistationary processes}
 
 \author{
-    Weiyi Chen\footnote{Department of Mathematics, Baruch College, CUNY. {\tt  weiyi.chen@baruchmail.cuny.edu}}{\setcounter{footnote}{1}},
+  Weiyi Chen\footnote{Department of Mathematics, Baruch College, CUNY. {\tt  weiyi.chen@baruchmail.cuny.edu}}{\setcounter{footnote}{1}},
   Rongxin Yu\footnote{Department of Mathematics, Baruch College, CUNY. {\tt  rongxin.yu@baruchmail.cuny.edu}}{\setcounter{footnote}{2}}, 
   Wenbo Zhang\footnote{Department of Mathematics, Baruch College, CUNY. {\tt wenbo.zhang@baruchmail.cuny.edu}{\setcounter{footnote}{3}}}
 }
@@ -137,7 +137,7 @@
 
 
 \begin{abstract}
-    In this report, we implement the hybrid scheme for Brownian semistationary processes \cite{bennedsen2015hybrid} (2015), which is an approximation of the process via discretizing the stochastic integral representation of the process in the time domain, and it is a combination of Wiener integrals of the power function and a Riemann sum. We exemplify the use of the hybrid scheme by two numerical experiments, where we replicate the study of Monte Carlo option pricing in the rough Bergomi model of Bayer et al. \cite{bayer2015pricing}, and analyze stability and sensitivity of parameters of hybrid scheme on price, respectively.
+  In this report, we implement the hybrid scheme for Brownian semistationary processes \cite{bennedsen2015hybrid} (2015), which is an approximation of the process via discretizing the stochastic integral representation of the process in the time domain, and it is a combination of Wiener integrals of the power function and a Riemann sum. We exemplify the use of the hybrid scheme by two numerical experiments, where we replicate the study of Monte Carlo option pricing in the rough Bergomi model of Bayer et al. \cite{bayer2015pricing}, and analyze stability and sensitivity of parameters of hybrid scheme on price, respectively.
 \end{abstract}
 
 \keywords{Stochastic simulation; discretization; Brownian semistationary process; stochastic volatility; regular variation; estimation; option pricing; rough volatility; volatility smile.}
@@ -154,16 +154,16 @@
 
 \section{Introduction}
 
-    \subsection{Brownian semistationary processes}
+  \subsection{Brownian semistationary processes}
 
-        A $\mathcal{BSS}$ process $X$ is defined via the integral representation
-        \begin{equation}
+    A $\mathcal{BSS}$ process $X$ is defined via the integral representation
+    \begin{equation}
       X(t) = \int_{-\infty}^{t} g(t-s)\sigma(s)dW(s)
     \end{equation}
       where $W$ is a two-sided Brownian motion providing the fundamental noise innovations, the amplitude of which is modulated by a stochastic volatility (intermittency) process $\sigma$ that may depend on $W$. This driving noise is then convolved with a deterministic kernel function $g$ that specifies the dependence structure of $X$.
         
       In the applications mentioned above, the case where X is not a semimartingale is particularly relevant. This situation arises when the kernel function $g$ behaves like a power-law near zero; more specifically, when for some $\alpha \in (-\frac{1}{2}, \frac{1}{2})$ and $\alpha \neq 0$,
-        \begin{equation}
+    \begin{equation}
       g(x) \propto x^\alpha \text{ for small } x>0
     \end{equation}
 
@@ -194,7 +194,7 @@
     The rest of this report is organized as follows. In Section 2 we recall the implementation of Hybrid Scheme for $\mathcal{BSS}$ process and introduce our initial assumptions for parameters, including the extension of the scheme to a class of truncated BSS processes, then proceed to option pricing under rough volatility. Section 3 briefly discusses the code structure with results, and presents the numerical experiments mentioned above. Section 4 contains discussing on computational complexity and implementation improvements from both theory perspective, i.e. vectorization programming, and technique perspective, i.e. multiprocessing. Finally, Section 5 presents the sensitivities of the experiment results.
 
 \section{Implementation}
-    \subsection{Brownian semistationary process}
+  \subsection{Brownian semistationary process}
       \subsubsection{Numerical recall}
         Simulating the $\mathcal{BSS}$ process $X$ on the equidistant grid $ \{0, \frac{1}{n}, \frac{2}{n}, \dots, \frac{\lfloor nT \rfloor}{n} \} $ for some $T>0$ using the hybrid scheme entails generating
         \begin{equation}
@@ -242,41 +242,8 @@
     
       \subsubsection{Code}
         The multivariate Gaussian with mean zero and covariance matrix $\Sigma$ implemented as 
-        \begin{lstlisting}
-covMatrix <- function(n, kappa){
-  ### generate the covariance matrix
-  ### @param n: the distance between two points is 1/n
-  ### @param kappa: how many power low terms to include around zero
-      
-  sigma <- matrix(0, nrow=kappa+1, ncol=kappa+1)
-  sigma[1,1] <- 1/n
-  for(j in 2:(kappa+1)){
-    sigma[1, j] <- ((j-1)^(alpha+1)-(j-2)^(alpha+1)) / ((alpha+1)*n^(alpha+1))
-    sigma[j, 1] <- ((j-1)^(alpha+1)-(j-2)^(alpha+1)) / ((alpha+1)*n^(alpha+1))
-  }
-  for(j in 2:(kappa+1)){
-    for(k in 2:(kappa+1)){
-      if(j==k){
-        sigma[j,k] <- ((j-1)^(2*alpha+1)-(j-2)^(2*alpha+1)) / ((2*alpha+1)*n^(2*alpha+1))
-      }
-      else{                            
-      }
-    }
-  }
-  return(sigma)
-}
 
-convolve <- function(x, y){
-    return(cumsum(x * rev(y)))
-}
-
-bstar <- function(k, alpha){
-  result <- ((k^(alpha+1) - (k-1)^(alpha+1)) / (alpha+1)) ^ (1/alpha)
-  return(result)
-}
-        \end{lstlisting}
-
-    \subsection{Truncated Brownian semistationary process}
+  \subsection{Truncated Brownian semistationary process}
       \subsubsection{Numerical recall}
     
       In the case of the $\mathcal{TBSS}$ process $Y$, the observations $Y_n(\frac{i}{n}), i=0,1,\dots,\lfloor nT \rfloor$, given by the hybrid scheme can be computed via
@@ -302,28 +269,6 @@ bstar <- function(k, alpha){
       and $\Gamma\star\Xi$ stands for the discrete convolution of the sequences $\Gamma$ and $\Xi$.
       
       \subsubsection{Code}
-        \begin{lstlisting}
-    Simulation <- function(n, kappa, T){
-       W <- mvrnorm(floor(n*T), mu=rep(0, kappa+1), Sigma=covMatrix(n, kappa))
-       Wperp <- rnorm(floor(n*T), sd=sqrt(1/n))
-       Z <- rho * W[,1] + sqrt(1-rho*rho)*Wperp
-       
-       Gamma <- sapply(seq(1:floor(n*T)), function(x){(bstar(x, alpha)/n)^alpha}) 
-       Gamma[1:kappa] <- 0
-       Y2 <- convolve(Gamma, W[,1])
-       Y1 <- rep(0, floor(n*T))
-       for(i in 1:floor(n*T)){
-         Y1[i] <-0
-         for (k in 1:min(i,kappa)){
-         Y1[i] = Y1[i] + W[i+1-k,k+1]
-         }
-       }
-       Y <- Y1+Y2 ## The simulated series of main interst
-       v <- xi*exp(eta*sqrt(2*alpha+1)*Y - eta*eta/2*sapply(seq(1:floor(n*T)),function(x){(x/n)^(2*alpha+1)}))
-       S <- S0 * exp(sum(v^0.5*Z) - 1/2*sum(v)/n)
-       return(S)
-    }
-        \end{lstlisting}
         
     \subsection{Option pricing under rough volatility}
         
@@ -343,7 +288,7 @@ bstar <- function(k, alpha){
       \begin{equation}
         Z(t):=\rho W(t)+ \sqrt{1-rho^2} W_\bot(t), t\in[0,T],
       \end{equation}
-        where $\rho \in (-1,1)$ is the correlation parameter and $\{W_\bot(t)\}_{t\in[0,T]}$ is a standard Brownian motion independent of $W$. The process $\{\xi_0(t)\}_{t\in[0,T]}$ is the forward variance curve, which we assume here to be flat, $\xi_0(t) = \xi > 0$ for all $t \in [0,T]$.
+      where $\rho \in (-1,1)$ is the correlation parameter and $\{W_\bot(t)\}_{t\in[0,T]}$ is a standard Brownian motion independent of $W$. The process $\{\xi_0(t)\}_{t\in[0,T]}$ is the forward variance curve, which we assume here to be flat, $\xi_0(t) = \xi > 0$ for all $t \in [0,T]$.
       
       We aim to compute using Monte Carlo simulation the price of a European call option struck at $K > 0$ with maturity $T$, which is given by
       \begin{equation}
@@ -353,41 +298,22 @@ bstar <- function(k, alpha){
       
       \subsubsection{Code}
       
-      \begin{lstlisting}
-BSImpliedVolCall <- function(S0, K, T, r, C){
-  nK <- length(K);
-  sigmaL <- rep(1e-10,nK);
-  CL <- BSFormula(S0, K, T, r, sigmaL);
-  sigmaH <- rep(10,nK);
-  CH <- BSFormula(S0, K, T, r, sigmaH);
-  while (mean(sigmaH - sigmaL) > 1e-10)
-  {
-    sigma <- (sigmaL + sigmaH)/2;
-    CM <- BSFormula(S0, K, T, r, sigma);
-    CL <- CL + (CM < C)*(CM-CL);
-    sigmaL <- sigmaL + (CM < C)*(sigma-sigmaL);
-    CH <- CH + (CM >= C)*(CM-CH);
-    sigmaH <- sigmaH + (CM >= C)*(sigma-sigmaH);
-  }
-  return(sigma);
-}
-
-BSFormula <- function(S0, K, T, r, sigma){
-  x <- log(S0/K)+r*T;
-  sig <- sigma*sqrt(T);
-  d1 <- x/sig+sig/2;
-  d2 <- d1 - sig;
-  pv <- exp(-r*T);
-  return( S0*pnorm(d1) - pv*K*pnorm(d2));
-}
-      
-impvol <- function(k, st, T){
-  payoff <- (st > exp(k)) * (st - exp(k))
-  return(BSImpliedVolCall(1, exp(k), T, 0, mean(payoff)))
-}
-      \end{lstlisting}
             
 \section{Numerical experiment and result}
+
+\subsection{Option pricing under rough volatility}
+
+As the first experiment, we study Monte Carlo option pricing in the rough Bergomi (rBergomi) model of Bayer et al. (2015). In the rBergomi model, the logarithmic spot variance of the price of the underlying is modeled by a rough Gaussian process, which is a special case of (10.1). By virtue of the rough volatility process, the model fits well to observed implied volatility smiles (Bayer et al., 2015, pp. 15-9). \newline
+
+\begin{tabular}{l*{6}{c}r}
+Parameters & $S(0)$ & $\xi$ & $\eta$ & $\alpha$ & $\rho$ \\
+\hline
+Values & 1 & $0.235^2$ & $1.9$ & $-0.43$ & $-0.9$  \\
+\end{tabular} \newline
+
+We map the option price $C(S(0),K,T)$ given in (2.13) to the corresponding Black-Scholes implied volatility $IV(S(0),K,T)$, see, e.g., Gatheral (2006). Reparameterizing the implied volatility using the log-strike $k := log(K/S0)$ allows us to drop the dependence on the initial price, so we will abuse notation slightly and write $IV(k,T)$ for the corresponding implied volatility. Figure 4 displays implied volatility smiles obtained from the rBergomi model using the hybrid and Riemann-sum schemes to simulate Y , as discussed above, and compares these to the smiles obtained using an exact simulation of Y via Cholesky factorization. The parameter values are given in Table 1. They have been adopted from Bayer et al. (2015), who demonstrate that they result in realistic volatility smiles. We consider two different maturities: "small", $T = 0.041$, and "large", $T = 1$.
+
+Implied volatility smiles corresponding to the option price (15.3), computed using Monte Carlo simulation (1 000 000 replications), with two maturities: T = 0.041 (left) and T = 1 (right). The spot variance process v was simulated using an exact method, the hybrid scheme ($\kappa = 1, 2$ and $b = b*$) and Riemann-sum scheme ($\kappa = 0$ and $b = b*$ (solid lines), $b = b_{FWD}$ (dashed lines)). The parameter values used in the rBergomi model are given in above Table.
 
 \section{Complexity improvements}
 
@@ -448,17 +374,6 @@ We are very grateful to Jim Gatheral's guide.
 { Gatheral, J.}, { Hsu, E.P.}, { Laurence, P.}, { Ouyang, C.}, and { Wang, T.-H.},
 {Asymptotics of implied volatility in local volatility models},
 {\it Mathematical Finance} (2011) forthcoming.
-
-@article{gatheral2012asymptotics,
-  title={Asymptotics of implied volatility in local volatility models},
-  author={Gatheral, Jim and Hsu, Elton P and Laurence, Peter and Ouyang, Cheng and Wang, Tai-Ho},
-  journal={Mathematical Finance},
-  volume={22},
-  number={4},
-  pages={591--620},
-  year={2012},
-  publisher={Wiley Online Library}
-}
 
 \end{thebibliography}
 
