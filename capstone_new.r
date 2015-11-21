@@ -128,14 +128,16 @@ hybridScheme <- function(params){
 
 impvol <- function(k, st, T){
   payoff <- (st > exp(k)) * (st - exp(k))
-  return(MyImpliedVolCall(1, exp(k), T, 0, mean(payoff)))
+  return(BSImpliedVolCall(1, exp(k), T, 0, mean(payoff)))
 }
 params <- list(S0=1, xi=0.235^2, eta=1.9, alpha=-0.43, rho=-0.9)
-finalPrices <- hybridScheme(params)(10000, 2000, 1, 0.041)
+T <- 0.1
+n <- 1000 # step length is 1/n
+paths <- 10000
+set.seed(9081)
+finalPrices <- hybridScheme(params)(paths, n, 1, T)
 summary(finalPrices)
 
-vol <- function(k){sapply(k, function(x){impvol(x, finalPrices, floor(n*T)/n)})}
+vol <- function(k){sapply(k, function(x){impvol(x, finalPrices, T)})}
 payoff <- function(k){sapply(k, function(x){mean((finalPrices > exp(x)) * (finalPrices - exp(x)))})}
 curve(vol(x), from=-0.5, to=0.5, xlab="Log strike", ylab="Implied Vol")
-
-
