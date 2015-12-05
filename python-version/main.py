@@ -19,7 +19,8 @@ def hybridScheme(params):
         sigma = zeros((kappa+1, kappa+1))
         sigma[0][0] = 1./n
         for j in range(1, kappa+1):
-            sigma[0][j] = sigma[j][0] = (j**(alpha+1) - (j-1)**(alpha+1)) / ((alpha+1)* n**(alpha+1))
+            sigma[0][j] = (j**(alpha+1) - (j-1)**(alpha+1)) / ((alpha+1)* n**(alpha+1))
+            sigma[j][0] = (j**(alpha+1) - (j-1)**(alpha+1)) / ((alpha+1)* n**(alpha+1))
         for j in range(1, kappa+1):
             for k in range(1, kappa+1):
                 if j == k:
@@ -43,6 +44,7 @@ def hybridScheme(params):
                 Y1[i] = Y1[i] + W[i+1-k][k+1]
         Y = Y1 + Y2
         v = xi * exp(eta * sqrt(2*alpha+1)*Y - eta**2/2 * array([(x/n)**(2*alpha+1) for x in range(int(n*T))]))
+        v = array([xi] + list(v[:-1]))
         S = S0 * exp(sum(v**0.5 * Z) - 0.5*sum(v)/n)
         return S
 
@@ -57,12 +59,13 @@ def impvol(k, st, T):
 
 def main():
     params = (1., 0.235**2, 1.9, -.43, -0.)
-    finalPrices = hybridScheme(params)(100, 100, 1, 1.)
-    pyplot.hist(finalPrices, 50, normed=1, histtype='bar', rwidth=.8)
+    strikes = array(range(-50,50)) / 100.
 
-    strikes = array(range(-100,100)) / 100.
-    vols = array([impvol(k, finalPrices, 1,) for k in strikes])
-    pyplot.plot(strikes, vols)
+    for kappa in range(3):
+        finalPrices = hybridScheme(params)(1000, 100, 1, 1)
+        #pyplot.hist(finalPrices, 50, normed=1, histtype='bar', rwidth=.8)
+        vols = array([impvol(k, finalPrices, 1,) for k in strikes])/100.
+        pyplot.plot(strikes, vols, lw=3)
     
     pyplot.show()
 
