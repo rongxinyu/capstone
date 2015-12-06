@@ -61,11 +61,11 @@ def main():
     params = (1., 0.235**2, 1.9, -.43, -0.)
     strikes = array(range(-50,50)) / 100.
 
-    for kappa in range(3):
-        finalPrices = hybridScheme(params)(1000, 100, 1, 1)
-        #pyplot.hist(finalPrices, 50, normed=1, histtype='bar', rwidth=.8)
-        vols = array([impvol(k, finalPrices, 1,) for k in strikes])/100.
-        pyplot.plot(strikes, vols, lw=3)
+
+    finalPrices = hybridScheme(params)(10000, 100, 1, 1)
+    #pyplot.hist(finalPrices, 50, normed=1, histtype='bar', rwidth=.8)
+    vols = array([impvol(k, finalPrices, 1,) for k in strikes])/100.
+    pyplot.plot(strikes, vols, lw=3)
     
     pyplot.show()
 

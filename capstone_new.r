@@ -72,6 +72,10 @@ hybridScheme <- function(params){
     
     sigma <- matrix(0, nrow=kappa+1, ncol=kappa+1)
     sigma[1,1] <- 1/n
+    if(kappa==0){
+      return (sigma)
+    }
+    else{
     for(j in 2:(kappa+1)){
       sigma[1, j] <- ((j-1)^(alpha+1)-(j-2)^(alpha+1)) / ((alpha+1)*n^(alpha+1))
       sigma[j, 1] <- ((j-1)^(alpha+1)-(j-2)^(alpha+1)) / ((alpha+1)*n^(alpha+1))
@@ -96,6 +100,7 @@ hybridScheme <- function(params){
     }
     #print(sigma)
     return(sigma)
+    }
   }
   
   Simulation <- function(n, kappa, T){
@@ -109,8 +114,10 @@ hybridScheme <- function(params){
     
     for(i in 1:floor(n*T)){
       Y1[i] <-0
+      if (kappa!=0 ){
       for (k in 1:min(i,kappa)){
         Y1[i] = Y1[i] + W[i+1-k,k+1]
+      }
       }
     }
     Y <- Y1+Y2 ## The simulated series of main interst
@@ -128,14 +135,152 @@ hybridScheme <- function(params){
 
 impvol <- function(k, st, T){
   payoff <- (st > exp(k)) * (st - exp(k))
-  return(MyImpliedVolCall(1, exp(k), T, 0, mean(payoff)))
+  return(BSImpliedVolCall(1, exp(k), T, 0, mean(payoff)))
 }
+
+
+
+
 params <- list(S0=1, xi=0.235^2, eta=1.9, alpha=-0.43, rho=-0.9)
-finalPrices <- hybridScheme(params)(10000, 2000, 1, 0.041)
+T <- 0.041
+n <- 1000 # step length is 1/n
+paths <- 1e4*4
+set.seed(9081)
+finalPrices <- hybridScheme(params)(paths, n, 1, T)
 summary(finalPrices)
 
-vol <- function(k){sapply(k, function(x){impvol(x, finalPrices, floor(n*T)/n)})}
-payoff <- function(k){sapply(k, function(x){mean((finalPrices > exp(x)) * (finalPrices - exp(x)))})}
-curve(vol(x), from=-0.5, to=0.5, xlab="Log strike", ylab="Implied Vol")
 
+
+vol <- function(k, finalP){sapply(k, function(x){impvol(x, finalP, T)})}
+payoff <- function(k, finalP){sapply(k, function(x){mean((finalP > exp(x)) * (finalP - exp(x)))})}
+
+
+
+# param2<- list(S0=1, xi=0.7, eta=1.9, alpha= -0.43, rho= -0.9)
+# finalPrices2<- hybridScheme(params)(paths, n, 0, T)
+# 
+# 
+# curve(vol(x, finalPrices), from=-0.3, to=0.2, col='blue',
+#       xlab="Log strike", ylab="Implied Vol", ylim= c(0, 0.55))
+# curve(vol(x, finalPrices2),from=-0.18, to=0.08, add=TRUE, col='red')
+# legend('topright', legend= c('kappa= 0', 'kappa= 1'), col= c('red', 'blue'), lty=1)
+# title(main = 'T=0.041')
+
+
+
+# 
+# k<-5
+# clr<- rainbow(k)
+# finalP<- list()
+# 
+# 
+# for (i in 1:k){
+#   
+#   param<- params
+#   param$xi<- param$xi+0.01*i
+#   print(i)
+#   
+#   finalP[[i]]<- hybridScheme(param)(paths, n,1,T)
+# }
+# save(finalP, file='finalP_xi.rData')
+# 
+# curve(vol(x, finalPrices), from=-0.15, to=0.15, col='black',
+#       xlab="Log strike", ylab="Implied Vol", ylim= c(0.1, 0.55) ,lwd=2)
+# 
+# for (i in 1:k){
+#   curve(vol(x, finalP[[i]]),from=-0.15, to=0.15, add=TRUE, col=clr[i], lwd=2)
+# }
+# 
+# 
+# 
+# legend( 'topright',
+#         legend=c ('xi= 0.235^2', 
+#                   'xi= 0.235^2+ 0.01',
+#                   'xi= 0.235^2+ 0.02',
+#                   'xi= 0.235^2+ 0.03',
+#                   'xi= 0.235^2+ 0.04',
+#                   'xi= 0.235^2+ 0.05'), 
+#         col = c('black', clr), lty=1)
+# 
+# 
+# title( 'Sensitivity on Xi')
+
+
+
+
+# 
+# k<-3
+# clr<- rainbow(k)
+# finalP<- list()
+# 
+# 
+# for (i in 1:k){
+#   
+#   param<- params
+#   param$eta<- param$eta+0.3*i
+#   print(i)
+#   
+#   finalP[[i]]<- hybridScheme(param)(paths, n,1,T)
+# }
+# save(finalP, file='finalP_eta.rData')
+# 
+# curve(vol(x, finalPrices), from=-0.15, to=0.15, col='black',
+#       xlab="Log strike", ylab="Implied Vol", ylim= c(0.1, 0.55) ,lwd=2)
+# 
+# for (i in 1:k){
+#   curve(vol(x, finalP[[i]]),from=-0.15, to=0.15, add=TRUE, col=clr[i], lwd=2)
+# }
+# 
+# 
+# 
+# legend( 'topright',
+#         legend=c ('eta= 1.9', 
+#                   'eta= 2.2',
+#                   'eta= 2.5',
+#                   'eta= 2.8'), 
+#         col = c('black', clr), lty=1)
+# 
+# 
+# title( 'Sensitivity on Eta')
+# 
+
+
+
+
+
+
+k<-4
+clr<- rainbow(k)
+finalP<- list()
+
+
+for (i in 1:k){
+  
+  param<- params
+  param$alpha<- param$alpha+0.02*i
+  print(i)
+  
+  finalP[[i]]<- hybridScheme(param)(paths, n,1,T)
+}
+save(finalP, file='finalP_alpha.rData')
+
+curve(vol(x, finalPrices), from=-0.25, to=0.1, col='black',
+      xlab="Log strike", ylab="Implied Vol", ylim= c(0.1, 0.55) ,lwd=2)
+
+for (i in 1:k){
+  curve(vol(x, finalP[[i]]),from=-0.25, to=0.1, add=TRUE, col=clr[i], lwd=2)
+}
+
+
+
+legend( 'topright',
+        legend=c ('alpha= -0.43', 
+                  'alpha= -0.41',
+                  'alpha= -0.39',
+                  'alpha= -0.37',
+                  'alpha= -0.35'), 
+        col = c('black', clr), lty=1)
+
+
+title( 'Sensitivity on Alpha')
 
