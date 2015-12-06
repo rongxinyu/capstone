@@ -142,9 +142,9 @@ impvol <- function(k, st, T){
 
 
 params <- list(S0=1, xi=0.235^2, eta=1.9, alpha=-0.43, rho=-0.9)
-T <- 1
+T <- 0.041
 n <- 1000 # step length is 1/n
-paths <- 1e5
+paths <- 1e4
 set.seed(9081)
 finalPrices <- hybridScheme(params)(paths, n, 1, T)
 summary(finalPrices)
@@ -155,21 +155,21 @@ vol <- function(k, finalP){sapply(k, function(x){impvol(x, finalP, T)})}
 payoff <- function(k, finalP){sapply(k, function(x){mean((finalP > exp(x)) * (finalP - exp(x)))})}
 
 
-
-# param2<- list(S0=1, xi=0.7, eta=1.9, alpha= -0.43, rho= -0.9)
-finalPrices2<- hybridScheme(params)(paths, n, 0, T)
-
-save(finalPrices, file='finalPT1kappa1.rData')
-save(finalPrices2,file ='finalPT1kappa0.rData')
-
-
-curve(vol(x, finalPrices), from=-0.3, to=0.2, col='blue',
-      xlab="Log strike", ylab="Implied Vol", ylim= c(0, 0.55))
-curve(vol(x, finalPrices2),from=-0.18, to=0.08, add=TRUE, col='red')
-legend('topright', legend= c('kappa= 0', 'kappa= 1'), col= c('red', 'blue'), lty=1)
-title(main = 'T=1')
-
-
+# 
+# # param2<- list(S0=1, xi=0.7, eta=1.9, alpha= -0.43, rho= -0.9)
+# finalPrices2<- hybridScheme(params)(paths, n, 0, T)
+# 
+# save(finalPrices, file='finalPT1kappa1.rData')
+# save(finalPrices2,file ='finalPT1kappa0.rData')
+# 
+# 
+# curve(vol(x, finalPrices), from=-0.3, to=0.2, col='blue',
+#       xlab="Log strike", ylab="Implied Vol", ylim= c(0, 0.55))
+# curve(vol(x, finalPrices2),from=-0.18, to=0.08, add=TRUE, col='red')
+# legend('topright', legend= c('kappa= 0', 'kappa= 1'), col= c('red', 'blue'), lty=1)
+# title(main = 'T=1')
+# 
+# 
 
 # 
 # k<-5
@@ -293,8 +293,8 @@ title(main = 'T=1')
 
 
 
-# 
-# 
+
+
 # 
 # k<-4
 # clr<- rainbow(k)
@@ -322,60 +322,60 @@ title(main = 'T=1')
 # 
 # 
 # legend( 'topright',
-#         legend=c ('alpha= -0.90', 
-#                   'alpha= -0.80',
-#                   'alpha= -0.70',
-#                   'alpha= -0.60',
-#                   'alpha= -0.50'), 
+#         legend=c ('rho= -0.90', 
+#                   'rho= -0.80',
+#                   'rho= -0.70',
+#                   'rho= -0.60',
+#                   'rho= -0.50'), 
 #         col = c('black', clr), lty=1)
 # 
 # 
 # 
 # 
 # title( 'Sensitivity on Rho')
-# 
-# 
-# 
-# 
-# 
-# k<-5
-# clr<- rainbow(k)
-# finalP<- list()
-# 
-# params$rho<-0
-# finalPrices <- hybridScheme(params)(paths, n, 1, T)
-# summary(finalPrices)
-# 
-# for (i in 1:k){
-#   
-#   param<- params
-#   param$alpha<- param$alpha+0.1*i
-#   print(i)
-#   
-#   finalP[[i]]<- hybridScheme(param)(paths, n,1,T)
-# }
-# 
-# save(finalP, file='finalP_rho.rData')
-# 
-# curve(vol(x, finalPrices), from=-0.08, to=0.15, col='black',
-#       xlab="Log strike", ylab="Implied Vol", ylim= c(0.15, 0.4) ,lwd=2)
-# 
-# for (i in 1:(k-1)){
-#   curve(vol(x, finalP[[i]]),from=-0.08, to=0.15, add=TRUE, col=clr[i], lwd=2)
-# }
-# 
-# 
-# 
-# legend( 'topleft',
-#         legend=c ('alpha= 0', 
-#                   'alpha= 0.10',
-#                   'alpha= 0.20',
-#                   'alpha= 0.30',
-#                   'alpha= 0.40'), 
-#         col = c('black', clr), lty=1)
-# 
-# 
-# 
-# 
-# title( 'Sensitivity on Rho')
+
+
+
+
+
+k<-5
+clr<- rainbow(k)
+finalP<- list()
+
+params$rho<-0
+finalPrices <- hybridScheme(params)(paths, n, 1, T)
+summary(finalPrices)
+
+for (i in 1:k){
+  
+  param<- params
+  param$alpha<- param$alpha+0.1*i
+  print(i)
+  
+  finalP[[i]]<- hybridScheme(param)(paths, n,1,T)
+}
+
+save(finalP, file='finalP_rho.rData')
+
+curve(vol(x, finalPrices), from=-0.08, to=0.15, col='black',
+      xlab="Log strike", ylab="Implied Vol", ylim= c(0.15, 0.4) ,lwd=2)
+
+for (i in 1:(k-1)){
+  curve(vol(x, finalP[[i]]),from=-0.08, to=0.15, add=TRUE, col=clr[i], lwd=2)
+}
+
+
+
+legend( 'topleft',
+        legend=c ('rho= 0', 
+                  'rho= 0.10',
+                  'rho= 0.20',
+                  'rho= 0.30',
+                  'rho= 0.40'), 
+        col = c('black', clr), lty=1)
+
+
+
+
+title( 'Sensitivity on Rho')
 
