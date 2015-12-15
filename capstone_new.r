@@ -99,10 +99,8 @@ hybridScheme <- function(params){
     }
   }
   
-  Simulation <- function(n, kappa, T){
-    W <- mvrnorm(floor(n*T), mu=rep(0, kappa+1), Sigma=covMatrix(n, kappa))
-    Wperp <- rnorm(floor(n*T), sd=sqrt(1/n))
-    Z <- rho * W[,1] + sqrt(1-rho*rho)*Wperp
+  Simulation <- function(n, kappa, T, W, Z){
+    #print(W)
     Gamma <- sapply(seq(1:floor(n*T)), function(x){(bstar(x, alpha)/n)^alpha}) 
     Gamma[1:kappa] <- 0
     Y2 <- convolve(Gamma, rev(W[,1]), type="open")[1:floor(n*T)]
@@ -124,7 +122,11 @@ hybridScheme <- function(params){
   }
   
   MC <- function(N, n, kappa, T){
-    return(unlist(mclapply(rep(T, N), function(x){Simulation(n, kappa, x)}, mc.cores = 4)))
+    steps <- floor(n*T)
+    W <- mvrnorm(steps*N, mu=rep(0, kappa+1), Sigma=covMatrix(n, kappa))
+    Wperp <- rnorm(steps*N, sd=sqrt(1/n))
+    Z <- rho * W[,1] + sqrt(1-rho*rho)*Wperp
+    return(sapply(seq(1:N), function(loopNum){Simulation(n, kappa, T, W[(1+(loopNum-1)*steps):(loopNum*steps),],Z[(1+(loopNum-1)*steps):(loopNum*steps)])}))
   }
   return(MC)
 }
