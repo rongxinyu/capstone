@@ -72,30 +72,30 @@ hybridScheme <- function(params){
       return (sigma)
     }
     else{
-    for(j in 2:(kappa+1)){
-      sigma[1, j] <- ((j-1)^(alpha+1)-(j-2)^(alpha+1)) / ((alpha+1)*n^(alpha+1))
-      sigma[j, 1] <- ((j-1)^(alpha+1)-(j-2)^(alpha+1)) / ((alpha+1)*n^(alpha+1))
-    }
-    for(j in 2:(kappa+1)){
-      for(k in 2:(kappa+1)){
-        if(j==k){
-          sigma[j,k] <- ((j-1)^(2*alpha+1)-(j-2)^(2*alpha+1)) / ((2*alpha+1)*n^(2*alpha+1))
-        }
-        else{
-          #print(((j-1)(k-1))^(alpha+1) * f21hyper(1,2*(alpha+1),alpha+2,(k-1)/(k-j))) #- 
-          #print(j)
-          #print(k)
-          #print((k-1)/(k-j))
-          #print(hyperg_2F1(1,2*(alpha+1),alpha+2,(k-1)/(k-j)))
-          #sigma[j,k] <- ((j-1)(k-1))^(alpha+1) * f21hyper(1,2*(alpha+1),alpha+2,(k-1)/(k-j)) #- 
-          #               ((j-2)(k-2))^(alpha+1) * f21hyper(1,2*(alpha+1),alpha+2,(k-2)/(k-j))) /
-          #               (j-k) * (alpha+1) * n^(2*alpha+1)  
-          
+      for(j in 2:(kappa+1)){
+        sigma[1, j] <- ((j-1)^(alpha+1)-(j-2)^(alpha+1)) / ((alpha+1)*n^(alpha+1))
+        sigma[j, 1] <- ((j-1)^(alpha+1)-(j-2)^(alpha+1)) / ((alpha+1)*n^(alpha+1))
+      }
+      for(j in 2:(kappa+1)){
+        for(k in 2:(kappa+1)){
+          if(j==k){
+            sigma[j,k] <- ((j-1)^(2*alpha+1)-(j-2)^(2*alpha+1)) / ((2*alpha+1)*n^(2*alpha+1))
+          }
+          else{
+            #print(((j-1)(k-1))^(alpha+1) * f21hyper(1,2*(alpha+1),alpha+2,(k-1)/(k-j))) #- 
+            #print(j)
+            #print(k)
+            #print((k-1)/(k-j))
+            #print(hyperg_2F1(1,2*(alpha+1),alpha+2,(k-1)/(k-j)))
+            #sigma[j,k] <- ((j-1)(k-1))^(alpha+1) * f21hyper(1,2*(alpha+1),alpha+2,(k-1)/(k-j)) #- 
+            #               ((j-2)(k-2))^(alpha+1) * f21hyper(1,2*(alpha+1),alpha+2,(k-2)/(k-j))) /
+            #               (j-k) * (alpha+1) * n^(2*alpha+1)  
+            
+          }
         }
       }
-    }
-    #print(sigma)
-    return(sigma)
+      #print(sigma)
+      return(sigma)
     }
   }
   
@@ -109,9 +109,9 @@ hybridScheme <- function(params){
     for(i in 1:floor(n*T)){
       Y1[i] <-0
       if (kappa!=0 ){
-      for (k in 1:min(i,kappa)){
-        Y1[i] = Y1[i] + W[i+1-k,k+1]
-      }
+        for (k in 1:min(i,kappa)){
+          Y1[i] = Y1[i] + W[i+1-k,k+1]
+        }
       }
     }
     Y <- Y1+Y2 ## The simulated series of main interst
@@ -149,7 +149,7 @@ params <- list(S0=1, xi=0.235^2, eta=1.9, alpha=-0.43, rho=-0.9)
 T <- 1
 n <- 10 # step length is 1/n
 paths <- 1e5
-kappa <- 0
+kappa <-1
 set.seed(9081)
 
 Rprof()
@@ -260,42 +260,42 @@ payoff <- function(k, finalP){sapply(k, function(x){mean((finalP > exp(x)) * (fi
 # 
 # 
 # 
-
-
-k<-4
-clr<- rainbow(k)
-finalP<- list()
-
-
-for (i in 1:k){
-  
-  param<- params
-  param$alpha<- param$alpha+0.02*i
-  print(i)
-  
-  finalP[[i]]<- hybridScheme(param)(paths, n,1,T)
-}
-save(finalP, file='finalP_alpha.rData')
-
-curve(vol(x, finalPrices), from=-0.15, to=0.1, col='black',
-      xlab="Log strike", ylab="Implied Vol", ylim= c(0.1, 0.55) ,lwd=2)
-
-for (i in 1:k){
-  curve(vol(x, finalP[[i]]),from=-0.18, to=0.1, add=TRUE, col=clr[i], lwd=2)
-}
-
-
-
-legend( 'topright',
-        legend=c ('alpha= -0.43', 
-                  'alpha= -0.41',
-                  'alpha= -0.39',
-                  'alpha= -0.37',
-                  'alpha= -0.35'), 
-        col = c('black', clr), lty=1)
-
-
-title( 'Sensitivity on Alpha')
+# 
+# 
+# k<-4
+# clr<- rainbow(k)
+# finalP<- list()
+# 
+# 
+# for (i in 1:k){
+#   
+#   param<- params
+#   param$alpha<- param$alpha+0.02*i
+#   print(i)
+#   
+#   finalP[[i]]<- hybridScheme(param)(paths, n,1,T)
+# }
+# save(finalP, file='finalP_alpha.rData')
+# 
+# curve(vol(x, finalPrices), from=-0.15, to=0.1, col='black',
+#       xlab="Log strike", ylab="Implied Vol", ylim= c(0.1, 0.55) ,lwd=2)
+# 
+# for (i in 1:k){
+#   curve(vol(x, finalP[[i]]),from=-0.18, to=0.1, add=TRUE, col=clr[i], lwd=2)
+# }
+# 
+# 
+# 
+# legend( 'topright',
+#         legend=c ('alpha= -0.43', 
+#                   'alpha= -0.41',
+#                   'alpha= -0.39',
+#                   'alpha= -0.37',
+#                   'alpha= -0.35'), 
+#         col = c('black', clr), lty=1)
+# 
+# 
+# title( 'Sensitivity on Alpha')
 
 
 
@@ -361,7 +361,7 @@ finalP<- list()
 #  param<- params
 #  param$alpha<- param$alpha+0.1*i
 #  print(i)
-  
+
 #  finalP[[i]]<- hybridScheme(param)(paths, n,1,T)
 #}
 
@@ -380,12 +380,11 @@ curve(vol(x, finalPrices), from=-0.35, to=0.35, col='black',
 #        legend=c ('rho= 0', 
 #                  'rho= 0.10',
 #                  'rho= 0.20',
- #                 'rho= 0.30',
+#                 'rho= 0.30',
 #                  'rho= 0.40'), 
- #       col = c('black', clr), lty=1)
+#       col = c('black', clr), lty=1)
 
 
 
 
 #title( 'Sensitivity on Rho')
-
