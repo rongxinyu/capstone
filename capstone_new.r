@@ -1,10 +1,6 @@
 rm(list=ls())
 library(MASS)
-library(gsl)
-library(ggplot2)
-Myconvolve <- function(x, y, length){
-  return(sum(x[1:length] * rev(y[1:length])))
-}
+library(parallel)
 
 bstar <- function(k, alpha){
   result <- ((k^(alpha+1) - (k-1)^(alpha+1)) / (alpha+1)) ^ (1/alpha)
@@ -109,7 +105,7 @@ hybridScheme <- function(params){
     Z <- rho * W[,1] + sqrt(1-rho*rho)*Wperp
     Gamma <- sapply(seq(1:floor(n*T)), function(x){(bstar(x, alpha)/n)^alpha}) 
     Gamma[1:kappa] <- 0
-    Y2 <- sapply(seq(1,floor(n*T)), function(x){Myconvolve(Gamma, W[,1], x)})
+    Y2 <- convolve(Gamma, rev(W[,1]), type="open")[1:floor(n*T)]
     Y1 <- rep(0, floor(n*T))
     
     for(i in 1:floor(n*T)){
@@ -128,7 +124,7 @@ hybridScheme <- function(params){
   }
   
   MC <- function(N, n, kappa, T){
-    return(sapply(rep(T, N), function(x){Simulation(n, kappa, x)}))
+    return(unlist(mclapply(rep(T, N), function(x){Simulation(n, kappa, x)}, mc.cores = 4)))
   }
   return(MC)
 }
