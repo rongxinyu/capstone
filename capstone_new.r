@@ -99,10 +99,9 @@ hybridScheme <- function(params){
     }
   }
   
-  Simulation <- function(n, kappa, T, W, Z){
+  Simulation <- function(n, kappa, T, W, Z, Gamma, tseq){
     #print(W)
-    Gamma <- sapply(seq(1:floor(n*T)), function(x){(bstar(x, alpha)/n)^alpha}) 
-    Gamma[1:kappa] <- 0
+    
     Y2 <- convolve(Gamma, rev(W[,1]), type="open")[1:floor(n*T)]
     Y1 <- rep(0, floor(n*T))
     
@@ -115,18 +114,22 @@ hybridScheme <- function(params){
       }
     }
     Y <- Y1+Y2 ## The simulated series of main interst
-    v <- xi*exp(eta*sqrt(2*alpha+1)*Y - eta*eta/2*sapply(seq(1:floor(n*T)),function(x){(x/n)^(2*alpha+1)}))
+    v <- xi*exp(eta*sqrt(2*alpha+1)*Y - tseq)
     v <- c(xi, v[1:length(v)-1])
     S <- S0 * exp(sum(v^0.5*Z) - 1/2*sum(v)/n)
     return(S)
   }
   
   MC <- function(N, n, kappa, T){
+    Gamma <- sapply(seq(1:floor(n*T)), function(x){(bstar(x, alpha)/n)^alpha}) 
+    Gamma[1:kappa] <- 0
+    tseq <- eta*eta/2*sapply(seq(1:floor(n*T)),function(x){(x/n)^(2*alpha+1)})
     steps <- floor(n*T)
     W <- mvrnorm(steps*N, mu=rep(0, kappa+1), Sigma=covMatrix(n, kappa))
     Wperp <- rnorm(steps*N, sd=sqrt(1/n))
     Z <- rho * W[,1] + sqrt(1-rho*rho)*Wperp
-    return(sapply(seq(1:N), function(loopNum){Simulation(n, kappa, T, W[(1+(loopNum-1)*steps):(loopNum*steps),],Z[(1+(loopNum-1)*steps):(loopNum*steps)])}))
+    return(sapply(seq(1:N), function(loopNum){Simulation(
+      n, kappa, T, W[(1+(loopNum-1)*steps):(loopNum*steps),],Z[(1+(loopNum-1)*steps):(loopNum*steps)], Gamma, tseq)}))
   }
   return(MC)
 }
@@ -140,9 +143,9 @@ impvol <- function(k, st, T){
 
 
 params <- list(S0=1, xi=0.235^2, eta=1.9, alpha=-0.43, rho=-0.9)
-T <- 0.041
-n <- 1000 # step length is 1/n
-paths <- 1e4
+T <- 1
+n <- 20 # step length is 1/n
+paths <- 1e5
 set.seed(9081)
 finalPrices <- hybridScheme(params)(paths, n, 1, T)
 summary(finalPrices)
@@ -340,40 +343,40 @@ k<-5
 clr<- rainbow(k)
 finalP<- list()
 
-params$rho<-0
-finalPrices <- hybridScheme(params)(paths, n, 1, T)
-summary(finalPrices)
+#params$rho<-0
+#finalPrices <- hybridScheme(params)(paths, n, 1, T)
+#summary(finalPrices)
 
-for (i in 1:k){
+#for (i in 1:k){
+#  
+#  param<- params
+#  param$alpha<- param$alpha+0.1*i
+#  print(i)
   
-  param<- params
-  param$alpha<- param$alpha+0.1*i
-  print(i)
-  
-  finalP[[i]]<- hybridScheme(param)(paths, n,1,T)
-}
+#  finalP[[i]]<- hybridScheme(param)(paths, n,1,T)
+#}
 
-save(finalP, file='finalP_rho.rData')
+#save(finalP, file='finalP_rho.rData')
 
-curve(vol(x, finalPrices), from=-0.08, to=0.15, col='black',
+curve(vol(x, finalPrices), from=-0.35, to=0.35, col='black',
       xlab="Log strike", ylab="Implied Vol", ylim= c(0.15, 0.4) ,lwd=2)
 
-for (i in 1:(k-1)){
-  curve(vol(x, finalP[[i]]),from=-0.08, to=0.15, add=TRUE, col=clr[i], lwd=2)
-}
+#for (i in 1:(k-1)){
+#  curve(vol(x, finalP[[i]]),from=-0.35, to=0.15, add=TRUE, col=clr[i], lwd=2)
+#}
 
 
 
-legend( 'topleft',
-        legend=c ('rho= 0', 
-                  'rho= 0.10',
-                  'rho= 0.20',
-                  'rho= 0.30',
-                  'rho= 0.40'), 
-        col = c('black', clr), lty=1)
+#legend( 'topleft',
+#        legend=c ('rho= 0', 
+#                  'rho= 0.10',
+#                  'rho= 0.20',
+ #                 'rho= 0.30',
+#                  'rho= 0.40'), 
+ #       col = c('black', clr), lty=1)
 
 
 
 
-title( 'Sensitivity on Rho')
+#title( 'Sensitivity on Rho')
 
