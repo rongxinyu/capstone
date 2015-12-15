@@ -101,8 +101,9 @@ hybridScheme <- function(params){
   
   Simulation <- function(n, kappa, T, W, Z, Gamma, tseq){
     #print(W)
+    if(kappa==0){Y2 <- convolve(Gamma, rev(W), type="open")[1:floor(n*T)]}
+    else{Y2 <- convolve(Gamma, rev(W[,1]), type="open")[1:floor(n*T)]}
     
-    Y2 <- convolve(Gamma, rev(W[,1]), type="open")[1:floor(n*T)]
     Y1 <- rep(0, floor(n*T))
     
     for(i in 1:floor(n*T)){
@@ -122,14 +123,16 @@ hybridScheme <- function(params){
   
   MC <- function(N, n, kappa, T){
     Gamma <- sapply(seq(1:floor(n*T)), function(x){(bstar(x, alpha)/n)^alpha}) 
-    Gamma[1:kappa] <- 0
+    if(kappa!=0) {Gamma[1:kappa] <- 0}
     tseq <- eta*eta/2*sapply(seq(1:floor(n*T)),function(x){(x/n)^(2*alpha+1)})
     steps <- floor(n*T)
     W <- mvrnorm(steps*N, mu=rep(0, kappa+1), Sigma=covMatrix(n, kappa))
     Wperp <- rnorm(steps*N, sd=sqrt(1/n))
     Z <- rho * W[,1] + sqrt(1-rho*rho)*Wperp
-    return(unlist(mclapply(seq(1:N), function(loopNum){Simulation(
-      n, kappa, T, W[(1+(loopNum-1)*steps):(loopNum*steps),],Z[(1+(loopNum-1)*steps):(loopNum*steps)], Gamma, tseq)}, mc.cores=4)))
+    return(sapply(seq(1:N), function(loopNum){Simulation(
+      n, kappa, T, W[(1+(loopNum-1)*steps):(loopNum*steps),],Z[(1+(loopNum-1)*steps):(loopNum*steps)], Gamma, tseq)}))
+    #return(unlist(mclapply(seq(1:N), function(loopNum){Simulation(
+    #  n, kappa, T, W[(1+(loopNum-1)*steps):(loopNum*steps),],Z[(1+(loopNum-1)*steps):(loopNum*steps)], Gamma, tseq)}, mc.cores=4)))
   }
   return(MC)
 }
@@ -144,12 +147,13 @@ impvol <- function(k, st, T){
 
 params <- list(S0=1, xi=0.235^2, eta=1.9, alpha=-0.43, rho=-0.9)
 T <- 1
-n <- 20 # step length is 1/n
+n <- 10 # step length is 1/n
 paths <- 1e5
+kappa <- 0
 set.seed(9081)
 
 Rprof()
-finalPrices <- hybridScheme(params)(paths, n, 1, T)
+finalPrices <- hybridScheme(params)(paths, n, kappa, T)
 Rprof(NULL)
 summaryRprof()
 
@@ -364,7 +368,7 @@ finalP<- list()
 #save(finalP, file='finalP_rho.rData')
 
 curve(vol(x, finalPrices), from=-0.35, to=0.35, col='black',
-      xlab="Log strike", ylab="Implied Vol", ylim= c(0.15, 0.4) ,lwd=2)
+      xlab="Log strike", ylab="Implied Vol", ylim= c(0, 0.4) ,lwd=2)
 
 #for (i in 1:(k-1)){
 #  curve(vol(x, finalP[[i]]),from=-0.35, to=0.15, add=TRUE, col=clr[i], lwd=2)
