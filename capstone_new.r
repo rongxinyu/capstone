@@ -147,7 +147,12 @@ T <- 1
 n <- 20 # step length is 1/n
 paths <- 1e5
 set.seed(9081)
+
+Rprof()
 finalPrices <- hybridScheme(params)(paths, n, 1, T)
+Rprof(NULL)
+summaryRprof()
+
 summary(finalPrices)
 
 
