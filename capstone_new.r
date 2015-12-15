@@ -128,8 +128,8 @@ hybridScheme <- function(params){
     W <- mvrnorm(steps*N, mu=rep(0, kappa+1), Sigma=covMatrix(n, kappa))
     Wperp <- rnorm(steps*N, sd=sqrt(1/n))
     Z <- rho * W[,1] + sqrt(1-rho*rho)*Wperp
-    return(sapply(seq(1:N), function(loopNum){Simulation(
-      n, kappa, T, W[(1+(loopNum-1)*steps):(loopNum*steps),],Z[(1+(loopNum-1)*steps):(loopNum*steps)], Gamma, tseq)}))
+    return(unlist(mclapply(seq(1:N), function(loopNum){Simulation(
+      n, kappa, T, W[(1+(loopNum-1)*steps):(loopNum*steps),],Z[(1+(loopNum-1)*steps):(loopNum*steps)], Gamma, tseq)}, mc.cores=4)))
   }
   return(MC)
 }
