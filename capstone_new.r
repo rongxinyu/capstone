@@ -81,20 +81,9 @@ hybridScheme <- function(params){
           if(j==k){
             sigma[j,k] <- ((j-1)^(2*alpha+1)-(j-2)^(2*alpha+1)) / ((2*alpha+1)*n^(2*alpha+1))
           }
-          else{
-            #print(((j-1)(k-1))^(alpha+1) * f21hyper(1,2*(alpha+1),alpha+2,(k-1)/(k-j))) #- 
-            #print(j)
-            #print(k)
-            #print((k-1)/(k-j))
-            #print(hyperg_2F1(1,2*(alpha+1),alpha+2,(k-1)/(k-j)))
-            #sigma[j,k] <- ((j-1)(k-1))^(alpha+1) * f21hyper(1,2*(alpha+1),alpha+2,(k-1)/(k-j)) #- 
-            #               ((j-2)(k-2))^(alpha+1) * f21hyper(1,2*(alpha+1),alpha+2,(k-2)/(k-j))) /
-            #               (j-k) * (alpha+1) * n^(2*alpha+1)  
-            
-          }
+          
         }
       }
-      #print(sigma)
       return(sigma)
     }
   }
