@@ -1,0 +1,45 @@
+<20150515 05:48:38.612225> id=1 symbol=ES lastTimestamp: 1431668905 
+<20150515 05:48:38.616154> id=1 symbol=ES  6 1 37 2117.00 0 0 
+<20150515 05:48:38.617512> id=1 symbol=ES optionHistoricalVol: 0.1131766589420608 NA 
+<20150515 05:48:38.618511> id=1 symbol=ES optionImpliedVol: 0.10628353295176816 
+<20150515 05:48:38.619616> id=1 symbol=ES lastPrice: 2117.00 
+<20150515 05:48:38.621890> id=1 symbol=ES lastSize: 1 
+<20150515 05:48:38.624075> id=1 symbol=ES  6 1 37 2117.00 0 0 
+<20150515 05:48:38.625679> id=1 symbol=ES optionHistoricalVol: 0.1131766589420608 NA 
+<20150515 05:48:38.626924> id=1 symbol=ES optionImpliedVol: 0.10628353295176816 
+<20150515 05:48:38.628146> id=1 symbol=ES Volume: 18710 
+<20150515 05:48:38.629225> id=1 symbol=ES highPrice: 2119.50 
+<20150515 05:48:38.630237> id=1 symbol=ES lowPrice: 2116.00 
+<20150515 05:48:38.631213> id=1 symbol=ES closePrice: 2117.50 
+<20150515 05:48:38.632297> id=1 symbol=ES  6 1 37 2117.00 0 0 
+<20150515 05:48:38.634010> id=1 symbol=ES optionHistoricalVol: 0.1131766589420608 NA 
+<20150515 05:48:38.636461> id=1 symbol=ES optionImpliedVol: 0.10628353295176816 
+<20150515 05:48:38.637428> id=1 symbol=ES openPrice: 2117.25 
+<20150515 05:48:38.638384> id=1 symbol=ES  6 1 37 2117.00 0 0 
+<20150515 05:48:38.640007> id=1 symbol=ES optionHistoricalVol: 0.1131766589420608 NA 
+<20150515 05:48:38.643563> id=1 symbol=ES optionImpliedVol: 0.10628353295176816 
+<20150515 05:48:38.645888> id=1 symbol=ES bidPrice: 2117.00  bidSize: 49 
+<20150515 05:48:38.647566> id=1 symbol=ES askPrice: 2117.25  askSize: 67 
+<20150515 05:48:38.649390> id=1 symbol=ES bidSize: 49 
+<20150515 05:48:38.650655> id=1 symbol=ES askSize: 67 
+<20150515 05:48:38.652863> id=1 symbol=ES  6 1 37 2117.00 0 0 
+<20150515 05:48:38.655078> id=1 symbol=ES optionHistoricalVol: 0.1131766589420608 NA 
+<20150515 05:48:38.656307> id=1 symbol=ES optionImpliedVol: 0.10628353295176816 
+<20150515 05:48:38.669157> id=1 symbol=ES optionCallOpenInterest: 961804 
+<20150515 05:48:38.670274> id=1 symbol=ES optionPutOpenInterest: 2037081 
+<20150515 05:48:38.711383> id=1 symbol=ES optionCallVolume: 1064 
+<20150515 05:48:38.712539> id=1 symbol=ES optionPutVolume: 2077 
+<20150515 05:48:40.773169> id=1 symbol=ES askSize: 69 
+<20150515 05:48:41.176019> id=1 symbol=ES optionCallVolume: 1069 
+<20150515 05:48:45.987591> id=1 symbol=ES askSize: 70 
+<20150515 05:48:51.794375> id=1 symbol=ES Volume: 18711 
+<20150515 05:48:51.797343> id=1 symbol=ES lastTimestamp: 1431668931 
+<20150515 05:48:51.799278> id=1 symbol=ES bidSize: 48 
+<20150515 05:48:52.795886> id=1 symbol=ES Volume: 18712 
+<20150515 05:48:52.796766> id=1 symbol=ES bidSize: 46 
+<20150515 05:48:53.795145> id=1 symbol=ES bidSize: 47 
+<20150515 05:48:58.505773> id=1 symbol=ES bidSize: 49 
+<20150515 05:48:59.513408> id=1 symbol=ES bidSize: 50 
+<20150515 05:49:03.913582> id=1 symbol=ES bidSize: 55 
+<20150515 05:49:04.915874> id=1 symbol=ES askSize: 72 
+<20150515 05:49:10.824595> id=1 symbol=ES bidSize: 56 
