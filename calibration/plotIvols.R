@@ -102,8 +102,6 @@ plotIvols_BSS<- function (ivolData, paths, n ,bssMatrix, kappa,  sviMatrix = NUL
     plot(k, askVol, col = "blue", pch = 18, cex = 0.5, xlim = xrange, 
          ylim = yrange, main = NA, xlab = NA, ylab = NA)
     
-    print(t)
-    
     finalPrices<- hybridScheme(bssMatrix[slice,])(paths,n,kappa, t)
     curve(ImpliedVol(x, finalPrices), from = kmin, to = kmax, col='dark green', add=TRUE)
     

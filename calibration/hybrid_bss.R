@@ -1,11 +1,10 @@
 library(MASS)
-library (parallel)
+library(parallel)
+
 bstar <- function(k, alpha){
   result <- ((k^(alpha+1) - (k-1)^(alpha+1)) / (alpha+1)) ^ (1/alpha)
   return(result)
 }
-
-
 
 BSFormula <- function(S0, K, T, r, sigma)
 {
@@ -14,10 +13,8 @@ BSFormula <- function(S0, K, T, r, sigma)
   d1 <- x/sig+sig/2;
   d2 <- d1 - sig;
   pv <- exp(-r*T);
-  return( S0*pnorm(d1) - pv*K*pnorm(d2));
+  return(S0*pnorm(d1) - pv*K*pnorm(d2));
 }
-
-
 
 BSImpliedVolCall <- function(S0, K, T, r, C)
 {
@@ -39,8 +36,6 @@ BSImpliedVolCall <- function(S0, K, T, r, C)
   
 }
 
-
-
 impvol <- function(k, st, T){
   payoff <- (st > exp(k)) * (st - exp(k))
   return(BSImpliedVolCall(1, exp(k), T, 0, mean(payoff)))
@@ -48,20 +43,12 @@ impvol <- function(k, st, T){
 
 ImpliedVol <- function(k, finalP){sapply(k, function(x){impvol(x, finalP, T)})}
 
-
-
-
-
-
-
 hybridScheme <- function(params){
-  
   S0 <- params$S0
   xi <- params$xi
   eta <- params$eta
   alpha <- params$alpha
   rho <- params$rho
-  
   
   covMatrix <- function(n, kappa){
     ### generate the covariance matrix
@@ -98,8 +85,8 @@ hybridScheme <- function(params){
     Y1 <- rep(0, floor(n*T))
     
     for(i in 1:floor(n*T)){
-      Y1[i] <-0
-      if (kappa!=0 ){
+      Y1[i] <- 0
+      if (kappa !=0 ){
         for (k in 1:min(i,kappa)){
           Y1[i] = Y1[i] + W[i+1-k,k+1]
         }
@@ -119,14 +106,9 @@ hybridScheme <- function(params){
     steps <- floor(n*T)
     W <- mvrnorm(steps*N, mu=rep(0, kappa+1), Sigma=covMatrix(n, kappa))
     Wperp <- rnorm(steps*N, sd=sqrt(1/n))
-    Z <- rho * W[,1] + sqrt(1-rho*rho)*Wperp
+    Z <- rho * W[,1] + sqrt(1-rho*rho) * Wperp
     return(sapply(seq(1:N), function(loopNum){Simulation(
       n, kappa, T, W[(1+(loopNum-1)*steps):(loopNum*steps),],Z[(1+(loopNum-1)*steps):(loopNum*steps)], Gamma, tseq)}))
   }
   return(MC)
 }
-
-
-
-
-
