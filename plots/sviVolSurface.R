@@ -30,8 +30,8 @@ print("Error: Wrong number of columns to be SVI data");
 return(NA);
 }
 
-deltak <- 0.01;
-deltat <- 0.01*(t>0.01)+t/2*(t<=0.01); # Make sure we don't end up with negative times!
+deltak <- 0.001;
+deltat <- 0.001*(t>0.001)+t/2*(t<=0.001); # Make sure we don't end up with negative times!
 
 
 # Estimate derivatives

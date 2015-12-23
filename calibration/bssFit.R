@@ -22,14 +22,10 @@ bssFit <- function(ivolData, paths, n, kappa=1){
     f <- (ivolData$Fwd[texp==t])[1];
     k <- log(ivolData$Strike[texp==t]/f)[pick]; # Plot vs log-strike
     
-    bssGuess <- list(S0=1)
-    # bssGuess <- list(S0=1, xi = mean(midVar,na.rm=T), eta= 1.9,  rho = -0.5, alpha=-0.43); 
-    # bssGuess$xi<- 0.235^2
-    
     # Define objective function
     obj <- function(bssparams){
       # tmp1 <- as.list(bssparams);
-      tmp1 <- list(S0=1.0, xi = mean(midVar,na.rm=T), eta= bssparams,  rho = -0.2064355, alpha=-0.43); 
+      tmp1 <- list(S0=1.0, xi = mean(midVar,na.rm=T), eta= 2.236068,  rho = bssparams, alpha=-0.001); 
       names(tmp1) <- c("S0","xi","eta","rho","alpha")
       bssVar<- bss(tmp1, k, paths, n, kappa, t);
       tmp <- sum((midVar-bssVar)^2, na.rm=T);
@@ -37,10 +33,10 @@ bssFit <- function(ivolData, paths, n, kappa=1){
     };
    
     # fit <- optim(bssGuess, obj);
-    fit <- optimize(obj, c(1, 3))
+    fit <- optimize(obj, c(-1, 1))
 
     # tmp1 <- as.list(fit$par)
-    tmp1 <- list(S0=1.0, xi = mean(midVar,na.rm=T), eta= fit$minimum,  rho = -0.2064355, alpha=-0.43); 
+    tmp1 <- list(S0=1.0, xi = mean(midVar,na.rm=T), eta= 2.236068,  rho = fit$minimum, alpha=-0.001); 
     
     # bssMatrix[slice,] <- tmp1 * c(1,1,1,1,1);
     bssMatrix[slice, ] <- unlist(tmp1);

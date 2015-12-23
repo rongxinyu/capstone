@@ -43,7 +43,7 @@ BSImpliedVolPut <- function(S0, K, T, r, P)
 {
 pv <- exp(-r*T);
 sigmaL <- 1e-10;
-intrinsic <- (pv*K-S0);
+intrinsic <- (K-pv*S0);
 nK <- length(K);
 sigmaL <- rep(1e-10,nK);
 PL <- BSFormula(S0, K, T, r, sigmaL)+intrinsic;
