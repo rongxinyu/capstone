@@ -58,9 +58,9 @@ n<-400
 # bssmatrix<- data.frame(S0=S0, alpha= alpha, eta=eta, xi=xi, rho=rho)
 
 
-# 
-# bssmatrix<- bssSqFit(spxOptData, paths = 5e3, n = 200)
-# save(bssmatrix, file= 'spx20110915bss.rData')
+
+bssmatrix<- bssSqFit(spxOptData, paths = 5e3, n = 200)
+save(bssmatrix, file= 'spx20110915bss.rData')
 
 # svifitSqrt <- sviSqrtFit(spxOptData)
 # svifitQR<- sviFitQR(ivolData = spxOptData, sviGuess = svifitSqrt ) 
