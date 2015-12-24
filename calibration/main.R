@@ -8,7 +8,7 @@ library(stinepack)
 # OxfordManRVRaw.data <- read.csv("OxfordManRealizedVolatilityIndices.csv", stringsAsFactors = F)
 # save(OxfordManRVRaw.data, file='OxfordManRVRaw.rData')
 
-load("spxOptionMetrics.rData")
+#load("spxOptionMetrics.rData")
 load('OxfordManRVRaw.rData')
 
 source("BlackScholes.R")
@@ -23,15 +23,21 @@ source("sviFitQuarticRoots.R")
 source("sviVolSurface.R")
 source('plotIvols_svibss.R')
 source('hybrid_bss.R')
-#source('bssFit.R')
+source('bssFit.R')
 source('bss.R')
 source('bssHistFit.R')
+
+download.file(url="http://mfe.baruch.cuny.edu/wp-content/uploads/2014/09/spxOptionMetrics.rData_.zip", destfile="spxOptionMetrics.rData.zip")
+unzip(zipfile="spxOptionMetrics.rData.zip")
+
+
+load("spxOptionMetrics.rData")
 
 
 set.seed(9081)
 spxData110915$strike_price <- spxData110915$strike_price/1000
 spxOptData <- generateOptionMetricsIvols(spxData110915)
-spxOptData <- spxOptData[spxOptData$Texp>0.5 & spxOptData$Texp<0.78,  ]
+# spxOptData <- spxOptData[spxOptData$Texp>0.5 & spxOptData$Texp<0.78,  ]
 
 symbol<- 'SPX2.rk'
 endDate<- '2011-09-15'
