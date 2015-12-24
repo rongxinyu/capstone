@@ -1,7 +1,9 @@
 library(stinepack)
 
 
-plotIvols_svibss<- function (ivolData, paths=NULL, n=NULL ,bssMatrix=NULL, kappa=NULL,  sviMatrix = NULL, slices = NULL) 
+plotIvols_svibss<- function (ivolData, paths=NULL, n=NULL ,
+                             bssMatrix=NULL, bssplotscale=NULL,  kappa=NULL,
+                             sviMatrix = NULL, slices = NULL) 
 {
   bidVols <- as.numeric(ivolData$Bid)
   askVols <- as.numeric(ivolData$Ask)
@@ -22,6 +24,9 @@ plotIvols_svibss<- function (ivolData, paths=NULL, n=NULL ,bssMatrix=NULL, kappa
   atmVol <- numeric(nSlices)
   atmSkew <- numeric(nSlices)
   par(mfrow = c(rows, columns), mex = 0.5)
+  
+  i<-1
+  
   for (slice in slices) {
     t <- expDates[slice]
     texp <- ivolData$Texp
@@ -59,8 +64,15 @@ plotIvols_svibss<- function (ivolData, paths=NULL, n=NULL ,bssMatrix=NULL, kappa
     
     ### plot bss fit
     if (! is.null(bssMatrix)){
-      finalPrices<- hybridScheme(bssMatrix[slice,])(paths,n,kappa, t)
-      curve(ImpliedVol(x, finalPrices), from = kmin, to = kmax, col='dark green', add=TRUE)
+      finalPrices<- hybridScheme(bssMatrix[i,])(paths,n,kappa, t)
+      # print(bssMatrix[slice,])
+      bsskmin<- kmin
+      bsskmax<- kmax
+      if (!is.na(bssplotscale)) {
+        bsskmin<-bsskmin*bssplotscale
+        bsskmax<-bsskmax*bssplotscale
+      }
+      curve(ImpliedVol(x, finalPrices, t), from = bsskmin, to = bsskmax, col='dark green',lwd=3,  add=TRUE)
     }
     
     
@@ -69,8 +81,10 @@ plotIvols_svibss<- function (ivolData, paths=NULL, n=NULL ,bssMatrix=NULL, kappa
     volInterp <- function(xout) {
       stinterp(x = kIn, y = volIn, xout)$y
     }
-    atmVol[slice] <- volInterp(0)
-    atmSkew[slice] <- (volInterp(0.01) - volInterp(-0.01))/0.02
+    atmVol[i] <- volInterp(0)
+    atmSkew[i] <- (volInterp(0.01) - volInterp(-0.01))/0.02
+    
+    i<- i+1
   }
   par(mfrow = c(1, 1), mex = 1)
   par(new = F)

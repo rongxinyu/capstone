@@ -41,7 +41,7 @@ impvol <- function(k, st, T){
   return(BSImpliedVolCall(1, exp(k), T, 0, mean(payoff)))
 }
 
-ImpliedVol <- function(k, finalP){sapply(k, function(x){impvol(x, finalP, T)})}
+ImpliedVol <- function(k, finalP, T){sapply(k, function(x){impvol(x, finalP, T)})}
 
 hybridScheme <- function(params){
   S0 <- params$S0
