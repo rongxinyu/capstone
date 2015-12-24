@@ -1,7 +1,7 @@
 rm(list=ls())
 
 library(stinepack)
-
+# 
 # download.file(url="http://realized.oxford-man.ox.ac.uk/media/1366/oxfordmanrealizedvolatilityindices.zip",
 #               destfile="oxfordRvData.zip")
 # unzip(zipfile="oxfordRvData.zip")
@@ -23,22 +23,23 @@ source("sviFitQuarticRoots.R")
 source("sviVolSurface.R")
 source('plotIvols_svibss.R')
 source('hybrid_bss.R')
-source('bssFit.R')
+#source('bssFit.R')
 source('bss.R')
-source('OxfordManRV.R')
+source('bssHistFit.R')
+
 
 set.seed(9081)
 spxData110915$strike_price <- spxData110915$strike_price/1000
 spxOptData <- generateOptionMetricsIvols(spxData110915)
-spxOptData <- spxOptData[spxOptData$Texp>0.03 & spxOptData$Texp<0.78,  ]
+spxOptData <- spxOptData[spxOptData$Texp>0.5 & spxOptData$Texp<0.78,  ]
 
 symbol<- 'SPX2.rk'
+endDate<- '2011-09-15'
+# rvData<- OxfordManRV.clean(rv.data = OxfordManRVRaw.data)
+# rvParam<- OxfordManRV.param(rv.list = rvData, endDate = '2011-09-15', symbol = symbol)
 
-rvData<- OxfordManRV.clean(rv.data = OxfordManRVRaw.data)
-rvParam<- OxfordManRV.param(rv.list = rvData, endDate = '2011-09-15', symbol = symbol)
 
-
-paths<-1e4
+paths<-1e3*5
 n<-400
 
 
@@ -49,7 +50,15 @@ svifitQR<- sviFitQR(ivolData = spxOptData, sviGuess = svifitSqrt )
 # #bssfit0 <- bssFit(spxOptData, paths, n, kappa=1)
 # ###
 # 
-bssparam<- list(S0=1, xi= 0.235^2, eta= rvParam$eta, alpha= rvParam$h-.5, rho=-.9)
-plotIvols_svibss(ivolData=spxOptData, paths=paths, n=400, 
-              bssMatrix=bssparam,  kappa=1, sviMatrix=svifitQR)
 
+t0<- proc.time()
+
+bssMatrix<- bss_histfit(ivolData = spxOptData, OxfordManRVData = OxfordManRVRaw.data, 
+            symbol = symbol, EndDate = endDate, paths = paths, n = n)
+
+proc.time()-t0
+
+# 
+# bssparam<- list(S0=1, xi= 0.235^2, eta= rvParam$eta, alpha= rvParam$h-.5, rho=-.9)
+plotIvols_svibss(ivolData=spxOptData, paths=paths, n=400, 
+              bssMatrix=bssMatrix,  kappa=1, sviMatrix=svifitQR)

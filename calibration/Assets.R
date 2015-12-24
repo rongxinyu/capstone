@@ -12,5 +12,5 @@ assetDailyReturn<- function (symbol, from, to){
   return (diff(log(price)))
 }
 
-ret<-assetDailyReturn('^GSPC', from='2000-01-01', to='2010-01-01')
-head(ret)
+# ret<-assetDailyReturn('^GSPC', from='2000-01-01', to='2010-01-01')
+# head(ret)
