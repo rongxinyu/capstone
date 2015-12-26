@@ -1,7 +1,5 @@
 # setwd("/Users/aliasgarhaji/ali/study/semester7/MTH9903/code/mth9903/a")
 
-source("BlackScholes.R");
-
 # This module takes in option metrics data from WRDS and returns the Ivols in the standard format.
 
 getDays <- function(s,e) {
